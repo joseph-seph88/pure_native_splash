@@ -11,7 +11,9 @@ class PureNativeSplashConfig {
   /// Light-mode splash background color, normalized to `#RRGGBB`/`#AARRGGBB`.
   final String color;
 
-  /// Dark-mode splash background color. Equal to [color] if not specified.
+  /// Dark-mode splash background color. Defaults to [color] if omitted
+  /// while [color] was set explicitly, otherwise defaults independently to
+  /// `#000000`.
   final String colorDark;
 
   /// Parses the `pure_native_splash:` section out of raw `pubspec.yaml`
@@ -34,21 +36,29 @@ class PureNativeSplashConfig {
     }
 
     final Object? rawColor = section['color'];
-    if (rawColor is! String) {
+    final String color;
+    if (rawColor == null) {
+      color = '#FFFFFF';
+    } else if (rawColor is String) {
+      color = normalizeHexColor(
+        rawColor,
+        fieldName: 'pure_native_splash.color',
+      );
+    } else {
       throw const FormatException(
-        'Missing required `pure_native_splash.color` in pubspec.yaml, e.g. '
-        'color: "#FFFFFF".',
+        '`pure_native_splash.color` must be a string, e.g. "#FFFFFF".',
       );
     }
-    final color = normalizeHexColor(
-      rawColor,
-      fieldName: 'pure_native_splash.color',
-    );
 
     final Object? rawColorDark = section['color_dark'];
     final String colorDark;
     if (rawColorDark == null) {
-      colorDark = color;
+      // If the user explicitly set `color`, `color_dark` mirrors it
+      // (preserves the pre-existing single-color behavior). If `color`
+      // itself was also omitted, default independently to black so a
+      // fully unconfigured section still produces a sensible light/dark
+      // pair instead of two whites.
+      colorDark = rawColor == null ? '#000000' : color;
     } else if (rawColorDark is String) {
       colorDark = normalizeHexColor(
         rawColorDark,

@@ -40,13 +40,27 @@ pure_native_splash:
       );
     });
 
-    test('throws when color is missing', () {
+    test(
+      'defaults color to white and color_dark to black when neither is '
+      'provided',
+      () {
+        final config = PureNativeSplashConfig.parse('''
+name: some_app
+
+pure_native_splash: {}
+''');
+        expect(config.color, '#FFFFFF');
+        expect(config.colorDark, '#000000');
+      },
+    );
+
+    test('throws when color is not a string', () {
       expect(
         () => PureNativeSplashConfig.parse('''
 name: some_app
 
 pure_native_splash:
-  color_dark: "#000000"
+  color: 123
 '''),
         throwsA(
           isA<FormatException>().having(

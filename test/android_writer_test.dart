@@ -28,7 +28,7 @@ void main() {
       fs.directory('$projectRoot/android').createSync(recursive: true);
     });
 
-    test('writes exactly 3 files at the expected paths', () {
+    test('writes exactly 7 files at the expected paths', () {
       final writer = AndroidSplashWriter(fs, projectRoot);
       final written = writer.write(
         const PureNativeSplashConfig(color: '#FFFFFF', colorDark: '#000000'),
@@ -36,6 +36,10 @@ void main() {
 
       expect(written, [
         '$resDir/drawable/splash_icon_blank.xml',
+        '$resDir/drawable/launch_background.xml',
+        '$resDir/drawable-v21/launch_background.xml',
+        '$resDir/drawable-night/launch_background.xml',
+        '$resDir/drawable-night-v21/launch_background.xml',
         '$resDir/values-v31/styles.xml',
         '$resDir/values-night-v31/styles.xml',
       ]);
@@ -57,6 +61,64 @@ void main() {
       expect(content, contains('android:width="1dp"'));
       expect(content, contains('android:height="1dp"'));
     });
+
+    test('drawable/launch_background.xml is a solid light-color shape', () {
+      final writer = AndroidSplashWriter(fs, projectRoot);
+      writer.write(
+        const PureNativeSplashConfig(color: '#ABCDEF', colorDark: '#111111'),
+      );
+
+      final content = fs
+          .file('$resDir/drawable/launch_background.xml')
+          .readAsStringSync();
+      expect(content, contains('android:color="#ABCDEF"'));
+      expect(content, isNot(contains('<size')));
+    });
+
+    test('drawable-v21/launch_background.xml is a solid light-color shape', () {
+      final writer = AndroidSplashWriter(fs, projectRoot);
+      writer.write(
+        const PureNativeSplashConfig(color: '#ABCDEF', colorDark: '#111111'),
+      );
+
+      final content = fs
+          .file('$resDir/drawable-v21/launch_background.xml')
+          .readAsStringSync();
+      expect(content, contains('android:color="#ABCDEF"'));
+      expect(content, isNot(contains('<size')));
+    });
+
+    test('drawable-night/launch_background.xml is a solid dark-color shape', () {
+      final writer = AndroidSplashWriter(fs, projectRoot);
+      writer.write(
+        const PureNativeSplashConfig(color: '#ABCDEF', colorDark: '#111111'),
+      );
+
+      final content = fs
+          .file('$resDir/drawable-night/launch_background.xml')
+          .readAsStringSync();
+      expect(content, contains('android:color="#111111"'));
+      expect(content, isNot(contains('<size')));
+    });
+
+    test(
+      'drawable-night-v21/launch_background.xml is a solid dark-color shape',
+      () {
+        final writer = AndroidSplashWriter(fs, projectRoot);
+        writer.write(
+          const PureNativeSplashConfig(
+            color: '#ABCDEF',
+            colorDark: '#111111',
+          ),
+        );
+
+        final content = fs
+            .file('$resDir/drawable-night-v21/launch_background.xml')
+            .readAsStringSync();
+        expect(content, contains('android:color="#111111"'));
+        expect(content, isNot(contains('<size')));
+      },
+    );
 
     test('values-v31/styles.xml uses light color', () {
       final writer = AndroidSplashWriter(fs, projectRoot);

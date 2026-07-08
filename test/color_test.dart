@@ -49,4 +49,34 @@ void main() {
       );
     });
   });
+
+  group('hexToSrgbComponents', () {
+    test('converts 6-digit hex to full-alpha components', () {
+      final c = hexToSrgbComponents('#FFFFFF');
+      expect(c.red, '1.000');
+      expect(c.green, '1.000');
+      expect(c.blue, '1.000');
+      expect(c.alpha, '1.000');
+    });
+
+    test('defaults alpha to 1.000 when hex has no alpha channel', () {
+      final c = hexToSrgbComponents('#3366FF');
+      expect(c.alpha, '1.000');
+    });
+
+    test('converts a mid-range 6-digit hex to fractional components', () {
+      final c = hexToSrgbComponents('#3366FF');
+      expect(c.red, '0.200');
+      expect(c.green, '0.400');
+      expect(c.blue, '1.000');
+    });
+
+    test('converts 8-digit hex including a non-opaque alpha channel', () {
+      final c = hexToSrgbComponents('#FF804020');
+      expect(c.alpha, '1.000');
+      expect(c.red, '0.502');
+      expect(c.green, '0.251');
+      expect(c.blue, '0.125');
+    });
+  });
 }

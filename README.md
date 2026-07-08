@@ -1,63 +1,39 @@
-A minimal native splash setup for Flutter apps.
+# pure_native_splash
 
-This package does exactly two things:
+A tool for Flutter apps that draw their splash screen directly in Flutter, and just want the native splash to be a plain solid-color background with no logo.
 
-1. Sets the native Android splash screen background color.
-2. Prevents Android 12+ from flashing your launcher icon on the splash
-   screen (by pointing `windowSplashScreenAnimatedIcon` at a transparent
-   1dp drawable).
+## When to use this
 
-That's it. No logo images, no branding, no animated icons, and no iOS
-changes (iOS doesn't have this launcher-icon-flash issue in the first
-place). If you need a logo/branding splash, use
-[`flutter_native_splash`](https://pub.dev/packages/flutter_native_splash)
-instead — this package intentionally does not grow into that.
+- Apps that don't use a logo/animation on the native splash, and draw the loading screen themselves with Flutter widgets
+- When you want to avoid a white flash, or (on Android 12+) a brief flash of the launcher icon, in between
 
 ## Setup
 
-Add the dev dependency:
-
-```yaml
-dev_dependencies:
-  pure_native_splash: ^0.1.0
-```
-
-Configure it, also in `pubspec.yaml`:
+Add to `pubspec.yaml`:
 
 ```yaml
 pure_native_splash:
-  color: "#FFFFFF"        # required. Light-mode background color.
-  color_dark: "#000000"   # optional. Defaults to `color` if omitted.
+  color: "#FFFFFF"        # Light-mode background color. Defaults to white if omitted
+  color_dark: "#000000"   # Dark-mode background color. Defaults to black if omitted
 ```
 
-Colors must be hex, either `#RRGGBB` or `#AARRGGBB`.
-
-## Run
+Then run:
 
 ```sh
 dart run pure_native_splash:create
 ```
 
-This generates/overwrites 3 files under `android/app/src/main/res/`:
+It applies automatically to whichever of `android/`/`ios/` folders exist. If both exist, both are handled.
 
-- `drawable/splash_icon_blank.xml`
-- `values-v31/styles.xml`
-- `values-night-v31/styles.xml`
+## Android 12+
 
-If any of those `values-*` folders are being created for the first time,
-run `flutter clean` once before your next build — Gradle's incremental
-build can otherwise miss brand-new resource qualifiers.
+Starting with Android 12, the OS forces the launcher icon onto the splash screen at app launch. Running this package prevents that automatically, with no extra configuration needed.
 
-## Ownership of generated files
+## License
 
-The 3 files above are considered fully owned by this package: every run
-of `create` overwrites them from scratch based on your current config.
-Don't hand-edit them — hand edits will silently disappear on the next
-run. This is a deliberate tradeoff to avoid the "regenerate silently
-drops my manual override" class of bugs.
+MIT License — see the [LICENSE](LICENSE) file for details.
 
-## Out of scope
+## Author
 
-- Logo/branding images, animated icons
-- iOS customization
-- Integration with `flutter_launcher_icons`
+- Joseph88
+- pathetic.sim@gmail.com

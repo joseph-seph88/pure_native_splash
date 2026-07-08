@@ -1,8 +1,9 @@
 name: pure_native_splash
 description: >-
-  Minimal native splash setup for Flutter: background color only, plus
+  Minimal native splash setup for Flutter apps that draw their own splash
+  in Flutter: background color only (Android + iOS, light/dark), plus
   hiding the Android 12+ launcher icon flash. No logos, no animations.
-version: 0.1.0
+version: 0.2.0
 homepage:
 
 environment:
