@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:file/local.dart';
 import 'package:path/path.dart' as p;
 import 'package:pure_native_splash/src/android_writer.dart';
@@ -38,6 +37,8 @@ void main() {
     return;
   }
 
+  final newQualifiers =
+      hasAndroid ? androidWriter.missingIntroducedQualifiers : <String>[];
   final written = <String>[
     if (hasAndroid) ...androidWriter.write(config),
     if (hasIos) ...iosWriter.write(config),
@@ -59,13 +60,12 @@ void main() {
       '\npure_native_splash: no ios/ directory found — skipped iOS files.',
     );
   }
-  if (hasAndroid) {
+  if (newQualifiers.isNotEmpty) {
     stdout.writeln(
-      '\nIf any of these Android resource folders (drawable-night, '
-      'drawable-night-v21, values-v31, values-night-v31) were just created '
-      "for the first time, run `flutter clean` once before your next "
-      "build — Gradle's incremental build can miss brand-new resource "
-      'qualifiers otherwise.',
+      '\nNew Android resource folders were created '
+      '(${newQualifiers.join(', ')}). Run `flutter clean` once before '
+      "your next build — Gradle's incremental build can miss brand-new "
+      'resource qualifiers otherwise.',
     );
   }
 }
