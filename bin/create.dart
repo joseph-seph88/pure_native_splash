@@ -1,20 +1,25 @@
 import 'dart:io';
-
 import 'package:file/local.dart';
 import 'package:path/path.dart' as p;
 import 'package:pure_native_splash/src/android_writer.dart';
 import 'package:pure_native_splash/src/config.dart';
+import 'package:pure_native_splash/src/ios_writer.dart';
 
 void main() {
   const fs = LocalFileSystem();
   final projectRoot = Directory.current.path;
-  final writer = AndroidSplashWriter(fs, projectRoot);
+  final androidWriter = AndroidSplashWriter(fs, projectRoot);
+  final iosWriter = IosSplashWriter(fs, projectRoot);
 
-  if (!writer.hasAndroidPlatform) {
+  final hasAndroid = androidWriter.hasAndroidPlatform;
+  final hasIos = iosWriter.hasIosPlatform;
+
+  if (!hasAndroid && !hasIos) {
     stderr.writeln(
-      'pure_native_splash: no android/ directory found under $projectRoot.\n'
-      'Run this from the root of a Flutter project that has the Android '
-      'platform added (flutter create --platforms=android .).',
+      'pure_native_splash: no android/ or ios/ directory found under '
+      '$projectRoot.\n'
+      'Run this from the root of a Flutter project that has at least one '
+      'platform added (e.g. flutter create --platforms=android,ios .).',
     );
     exitCode = 1;
     return;
@@ -32,15 +37,35 @@ void main() {
     return;
   }
 
-  final written = writer.write(config);
+  final newQualifiers =
+      hasAndroid ? androidWriter.missingIntroducedQualifiers : <String>[];
+  final written = <String>[
+    if (hasAndroid) ...androidWriter.write(config),
+    if (hasIos) ...iosWriter.write(config),
+  ];
+
   stdout.writeln('pure_native_splash: wrote ${written.length} files:');
   for (final path in written) {
     stdout.writeln('  - ${p.relative(path, from: projectRoot)}');
   }
-  stdout.writeln(
-    '\nIf any of these resource folders (values-v31, values-night-v31) were '
-    'just created for the first time, run `flutter clean` once before your '
-    "next build — Gradle's incremental build can miss brand-new values-* "
-    'qualifiers otherwise.',
-  );
+
+  if (!hasAndroid) {
+    stdout.writeln(
+      '\npure_native_splash: no android/ directory found — skipped Android '
+      'files.',
+    );
+  }
+  if (!hasIos) {
+    stdout.writeln(
+      '\npure_native_splash: no ios/ directory found — skipped iOS files.',
+    );
+  }
+  if (newQualifiers.isNotEmpty) {
+    stdout.writeln(
+      '\nNew Android resource folders were created '
+      '(${newQualifiers.join(', ')}). Run `flutter clean` once before '
+      "your next build — Gradle's incremental build can miss brand-new "
+      'resource qualifiers otherwise.',
+    );
+  }
 }

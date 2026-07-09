@@ -1,18 +1,23 @@
 name: pure_native_splash
 description: >-
-  Minimal native splash setup for Flutter: background color only, plus
-  hiding the Android 12+ launcher icon flash. No logos, no animations.
-version: 0.1.0
-homepage:
+  Solid-color native splash for Android and iOS (light & dark), hiding
+  the Android 12+ icon flash.
+version: 0.3.0
+repository: https://github.com/joseph-seph88/pure_native_splash
+topics:
+  - splash-screen
+  - launch-screen
+  - android
+  - ios
 
 environment:
-  sdk: ^3.9.2
+  sdk: '>=3.0.0 <4.0.0'
 
 dependencies:
-  yaml: ^3.1.2
-  path: ^1.9.0
-  file: ^7.0.1
+  yaml: '>=3.1.0 <4.0.0'
+  path: '>=1.8.0 <2.0.0'
+  file: '>=6.1.4 <8.0.0'
 
 dev_dependencies:
-  lints: ^5.0.0
+  lints: ^6.0.0
   test: ^1.25.8

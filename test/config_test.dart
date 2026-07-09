@@ -40,13 +40,69 @@ pure_native_splash:
       );
     });
 
-    test('throws when color is missing', () {
+    test(
+      'defaults color to white and color_dark to black when neither is '
+      'provided',
+      () {
+        final config = PureNativeSplashConfig.parse('''
+name: some_app
+
+pure_native_splash: {}
+''');
+        expect(config.color, '#FFFFFF');
+        expect(config.colorDark, '#000000');
+      },
+    );
+
+    test('throws a quoting hint when color has no value (unquoted hex)', () {
+      // `color: #FFFFFF` without quotes: YAML reads `#...` as a comment,
+      // leaving the key present with a null value.
       expect(
         () => PureNativeSplashConfig.parse('''
 name: some_app
 
 pure_native_splash:
-  color_dark: "#000000"
+  color: #FFFFFF
+'''),
+        throwsA(
+          isA<FormatException>().having(
+            (e) => e.message,
+            'message',
+            contains('quote it'),
+          ),
+        ),
+      );
+    });
+
+    test(
+      'throws a quoting hint when color_dark has no value (unquoted hex)',
+      () {
+        expect(
+          () => PureNativeSplashConfig.parse('''
+name: some_app
+
+pure_native_splash:
+  color: "#FFFFFF"
+  color_dark: #000000
+'''),
+          throwsA(
+            isA<FormatException>().having(
+              (e) => e.message,
+              'message',
+              contains('quote it'),
+            ),
+          ),
+        );
+      },
+    );
+
+    test('throws when color is not a string', () {
+      expect(
+        () => PureNativeSplashConfig.parse('''
+name: some_app
+
+pure_native_splash:
+  color: 123
 '''),
         throwsA(
           isA<FormatException>().having(

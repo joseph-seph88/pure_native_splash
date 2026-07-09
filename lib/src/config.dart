@@ -1,22 +1,19 @@
 import 'package:file/file.dart';
 import 'package:yaml/yaml.dart';
-
 import 'color.dart';
 
-/// The resolved `pure_native_splash:` configuration read from a consuming
-/// app's `pubspec.yaml`.
+/// The `pure_native_splash:` config from the consuming app's `pubspec.yaml`.
 class PureNativeSplashConfig {
   const PureNativeSplashConfig({required this.color, required this.colorDark});
 
-  /// Light-mode splash background color, normalized to `#RRGGBB`/`#AARRGGBB`.
+  /// Normalized to `#RRGGBB`/`#AARRGGBB`.
   final String color;
 
-  /// Dark-mode splash background color. Equal to [color] if not specified.
+  /// Falls back to [color], or `#000000` when both were omitted.
   final String colorDark;
 
-  /// Parses the `pure_native_splash:` section out of raw `pubspec.yaml`
-  /// text. Throws a [FormatException] with a user-facing message if the
-  /// section is missing or invalid.
+  /// Throws a user-facing [FormatException] if the section is missing or
+  /// invalid.
   static PureNativeSplashConfig parse(String pubspecYamlContent) {
     final Object? doc = loadYaml(pubspecYamlContent);
     if (doc is! Map) {
@@ -34,21 +31,41 @@ class PureNativeSplashConfig {
     }
 
     final Object? rawColor = section['color'];
-    if (rawColor is! String) {
+    final String color;
+    if (rawColor == null) {
+      if (section.containsKey('color')) {
+        throw const FormatException(
+          '`pure_native_splash.color` has no value. If you wrote an '
+          'unquoted hex color (e.g. `color: #FFFFFF`), YAML reads '
+          'everything after `#` as a comment — quote it: '
+          '`color: "#FFFFFF"`.',
+        );
+      }
+      color = '#FFFFFF';
+    } else if (rawColor is String) {
+      color = normalizeHexColor(
+        rawColor,
+        fieldName: 'pure_native_splash.color',
+      );
+    } else {
       throw const FormatException(
-        'Missing required `pure_native_splash.color` in pubspec.yaml, e.g. '
-        'color: "#FFFFFF".',
+        '`pure_native_splash.color` must be a string, e.g. "#FFFFFF".',
       );
     }
-    final color = normalizeHexColor(
-      rawColor,
-      fieldName: 'pure_native_splash.color',
-    );
 
     final Object? rawColorDark = section['color_dark'];
     final String colorDark;
     if (rawColorDark == null) {
-      colorDark = color;
+      if (section.containsKey('color_dark')) {
+        throw const FormatException(
+          '`pure_native_splash.color_dark` has no value. If you wrote an '
+          'unquoted hex color (e.g. `color_dark: #000000`), YAML reads '
+          'everything after `#` as a comment — quote it: '
+          '`color_dark: "#000000"`.',
+        );
+      }
+      // Mirror an explicit `color`; black only when nothing was configured.
+      colorDark = rawColor == null ? '#000000' : color;
     } else if (rawColorDark is String) {
       colorDark = normalizeHexColor(
         rawColorDark,
@@ -63,7 +80,6 @@ class PureNativeSplashConfig {
     return PureNativeSplashConfig(color: color, colorDark: colorDark);
   }
 
-  /// Reads and parses `pubspec.yaml` from [projectRoot] on [fs].
   static PureNativeSplashConfig readFromProject(
     FileSystem fs,
     String projectRoot,
