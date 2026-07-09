@@ -5,7 +5,7 @@ A tool for Flutter apps that draw their splash screen directly in Flutter, and j
 ## When to use this
 
 - Apps that don't use a logo/animation on the native splash, and draw the loading screen themselves with Flutter widgets
-- When you want to avoid a white flash, or (on Android 12+) a brief flash of the launcher icon, in between
+- When you want to avoid a white flash, or (on Android 12+) a brief flash of the launcher icon — handled automatically, no extra configuration
 
 ## Setup
 
@@ -13,8 +13,8 @@ Add to `pubspec.yaml`:
 
 ```yaml
 pure_native_splash:
-  color: "#FFFFFF"        # Light-mode background color. Defaults to white if omitted
-  color_dark: "#000000"   # Dark-mode background color. Defaults to black if omitted
+  color: "#FFFFFF" # Hex only (#RRGGBB or #AARRGGBB). Quotes required — unquoted # starts a YAML comment
+  color_dark: "#000000" # Optional. Falls back to `color`, or black if both omitted
 ```
 
 Then run:
@@ -23,11 +23,30 @@ Then run:
 dart run pure_native_splash:create
 ```
 
-It applies automatically to whichever of `android/`/`ios/` folders exist. If both exist, both are handled.
+## Removing
 
-## Android 12+
+To restore the stock Flutter splash files and delete everything this package generated:
 
-Starting with Android 12, the OS forces the launcher icon onto the splash screen at app launch. Running this package prevents that automatically, with no extra configuration needed.
+```sh
+dart run pure_native_splash:remove
+```
+
+Files you have edited by hand are left untouched.
+
+## Migrating from flutter_native_splash
+
+If you are migrating from `flutter_native_splash`, run its cleanup before removing it from `pubspec.yaml`, so the splash images it generated get deleted:
+
+```sh
+dart run flutter_native_splash:remove
+```
+
+Even if you skip this, this package still works fine — you would just need to delete the previously generated images manually.
+
+## Limitations
+
+- Assumes the stock `flutter create` project layout; only `android/app/src/main/res` is written — flavor-specific resources (`src/<flavor>/res`) are not supported.
+- Android and iOS only; web and desktop are out of scope.
 
 ## License
 

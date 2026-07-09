@@ -1,10 +1,7 @@
 final _hexColorPattern = RegExp(r'^#([0-9a-fA-F]{6}|[0-9a-fA-F]{8})$');
 
-/// Validates a hex color string and normalizes it to `#RRGGBB` or
-/// `#AARRGGBB` with uppercase digits.
-///
-/// [fieldName] is used only to produce a clear error message, e.g.
-/// `pure_native_splash.color`.
+/// Normalizes to uppercase `#RRGGBB`/`#AARRGGBB`, throwing a user-facing
+/// [FormatException] for anything else.
 String normalizeHexColor(String input, {required String fieldName}) {
   final trimmed = input.trim();
   final match = _hexColorPattern.firstMatch(trimmed);
@@ -17,13 +14,9 @@ String normalizeHexColor(String input, {required String fieldName}) {
   return '#${match.group(1)!.toUpperCase()}';
 }
 
-/// Converts an already-normalized `#RRGGBB`/`#AARRGGBB` hex color (as
-/// returned by [normalizeHexColor]) into 0-1 sRGB float components
-/// formatted as 3-decimal strings (e.g. `"1.000"`, `"0.200"`), matching the
-/// format Xcode's asset-catalog `Contents.json` colorset entries use.
-/// Alpha defaults to `"1.000"` when [hex] has no alpha channel (6 hex
-/// digits). Does not itself validate [hex]'s format — callers must pass a
-/// string already validated by [normalizeHexColor].
+/// 0-1 sRGB components as 3-decimal strings — the format Xcode's colorset
+/// `Contents.json` uses. [hex] must already be normalized by
+/// [normalizeHexColor]; this does not re-validate it.
 ({String red, String green, String blue, String alpha}) hexToSrgbComponents(
   String hex,
 ) {

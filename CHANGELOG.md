@@ -1,3 +1,20 @@
+## 0.3.0
+
+* Add `dart run pure_native_splash:remove`: restores the stock
+  `flutter create` splash files and deletes everything this package
+  generated. Files that no longer carry the generated marker (edited by
+  hand or written by another tool) are left untouched and reported.
+* The generated `LaunchScreen.storyboard` no longer contains the
+  `LaunchImage` image view. On stock projects nothing changes visually
+  (those images are blank), but on projects migrating from
+  flutter_native_splash this stops the previous logo from reappearing
+  on top of the splash color.
+* An unquoted hex color (e.g. `color: #FFFFFF`, which YAML reads as an
+  empty value plus a comment) is now a clear error suggesting quotes,
+  instead of silently falling back to the default color.
+* `create` now prints the `flutter clean` reminder only when it actually
+  created new Android resource folders, and names them.
+
 ## 0.2.0
 
 * Fix: the background color now applies on Android <12, not just 12+.
