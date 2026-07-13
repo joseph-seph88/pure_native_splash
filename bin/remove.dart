@@ -2,9 +2,12 @@ import 'dart:io';
 import 'package:file/local.dart';
 import 'package:path/path.dart' as p;
 import 'package:pure_native_splash/src/android_writer.dart';
+import 'package:pure_native_splash/src/cli_banner.dart';
 import 'package:pure_native_splash/src/ios_writer.dart';
 
-void main() {
+Future<void> main() async {
+  printBanner('PURE NATIVE SPLASH (v${await resolvePackageVersion()})');
+
   const fs = LocalFileSystem();
   final projectRoot = Directory.current.path;
   final androidWriter = AndroidSplashWriter(fs, projectRoot);
@@ -15,16 +18,18 @@ void main() {
 
   if (!hasAndroid && !hasIos) {
     stderr.writeln(
-      'pure_native_splash: no android/ or ios/ directory found under '
-      '$projectRoot.\n'
+      'No android/ or ios/ directory found under $projectRoot.\n'
       'Run this from the root of a Flutter project.',
     );
     exitCode = 1;
     return;
   }
 
+  if (hasAndroid) printStep('Restoring Android splash resources');
   final androidResult = hasAndroid ? androidWriter.remove() : null;
+  if (hasIos) printStep('Restoring iOS splash resources');
   final iosResult = hasIos ? iosWriter.remove() : null;
+
   final results = [
     if (androidResult != null) androidResult,
     if (iosResult != null) iosResult,
@@ -35,24 +40,26 @@ void main() {
 
   void printSection(String label, List<String> paths) {
     if (paths.isEmpty) return;
-    stdout.writeln('pure_native_splash: $label:');
+    stdout.writeln('$label:');
     for (final path in paths) {
       stdout.writeln('  - ${p.relative(path, from: projectRoot)}');
     }
   }
 
-  printSection('restored ${restored.length} stock files', restored);
-  printSection('deleted ${deleted.length} generated files', deleted);
+  printSuccess(
+    'Restored ${restored.length} files, deleted ${deleted.length} files',
+  );
+  printSection('Restored', restored);
+  printSection('Deleted', deleted);
   printSection(
-    'left ${skipped.length} files alone (no pure_native_splash marker — '
-    'edited by hand or written by another tool)',
+    'Left alone (no pure_native_splash marker — edited by hand or written '
+    'by another tool)',
     skipped,
   );
 
   if (restored.isEmpty && deleted.isEmpty && skipped.isEmpty) {
     stdout.writeln(
-      'pure_native_splash: nothing to remove — no files written by '
-      'pure_native_splash found.',
+      'Nothing to remove — no files written by pure_native_splash found.',
     );
   }
 
