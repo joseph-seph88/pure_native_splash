@@ -1,3 +1,8 @@
+## 0.3.1
+
+* `create` and `remove` now print a banner and step-by-step progress instead
+  of a plain file list.
+
 ## 0.3.0
 
 * Add `dart run pure_native_splash:remove`: restores the stock
