@@ -1,14 +1,15 @@
 name: pure_native_splash
 description: >-
-  Solid-color native splash for Android and iOS (light & dark), hiding
-  the Android 12+ icon flash.
-version: 0.3.1
+  Solid-color native splash for Android and iOS (light & dark). Removes
+  the iOS white flash and hides the Android 12+ icon flash.
+version: 0.3.2
 repository: https://github.com/joseph-seph88/pure_native_splash
 topics:
   - splash-screen
   - launch-screen
   - android
   - ios
+  - native-splash
 
 environment:
   sdk: '>=3.0.0 <4.0.0'

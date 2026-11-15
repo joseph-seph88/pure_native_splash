@@ -1,3 +1,11 @@
+## 0.3.2
+
+* Docs: README now opens with the problem it solves (the white flash at app
+  launch) and a short feature list.
+* pub.dev metadata: updated the package description and added the
+  `native-splash` topic.
+* Removed the author email from the README.
+
 ## 0.3.1
 
 * `create` and `remove` now print a banner and step-by-step progress instead

@@ -1,11 +1,23 @@
 # pure_native_splash
 
-A tool for Flutter apps that draw their splash screen directly in Flutter, and just want the native splash to be a plain solid-color background with no logo.
+Removes the white flash at app launch. A solid-color native splash for Flutter apps that draw their own splash screen in Flutter.
+
+<!--
+TODO: add the before/after GIF, then uncomment (publish only after the file exists):
+![Before and after on iOS](https://raw.githubusercontent.com/joseph-seph88/pure_native_splash/main/doc/before_after.gif)
+*Left: image-view launch screen (white flash). Right: pure_native_splash. Real iPhone, release build, slow motion.*
+-->
+
+- **Solid color only** — no logo, no image view.
+- **iOS:** no white flash before your first Flutter frame (checked on a real device, release build).
+- **Android:** 11 and below, and 12+ (hides the launcher-icon flash).
+- **Light & dark mode.**
+- **One command to apply, one to undo.**
+- **Leaves `Info.plist` and `project.pbxproj` untouched.**
 
 ## When to use this
 
-- Apps that don't use a logo/animation on the native splash, and draw the loading screen themselves with Flutter widgets
-- When you want to avoid a white flash, or (on Android 12+) a brief flash of the launcher icon — handled automatically, no extra configuration
+Use it if your app doesn't put a logo or animation on the native splash, and draws the loading screen itself with Flutter widgets. If you want a logo on the native splash, this package is not for you.
 
 ## Setup
 
@@ -55,4 +67,3 @@ MIT License — see the [LICENSE](LICENSE) file for details.
 ## Author
 
 - Joseph88
-- pathetic.sim@gmail.com
